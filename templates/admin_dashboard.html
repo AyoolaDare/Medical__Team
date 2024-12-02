@@ -6,6 +6,7 @@
 <div class="container-fluid">
     <h1 class="mb-4">Admin Dashboard</h1>
 
+    <!-- Search Form -->
     <div class="row mb-4">
         <div class="col-md-12">
             <form action="{{ url_for('admin.search') }}" method="GET" class="d-flex">
@@ -15,6 +16,7 @@
         </div>
     </div>
 
+    <!-- Dashboard Summary Cards -->
     <div class="row">
         <div class="col-md-4 mb-4">
             <div class="card dashboard-card bg-primary text-white">
@@ -24,7 +26,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-md-4 mb-4">
             <div class="card dashboard-card bg-success text-white">
                 <div class="card-body">
@@ -33,7 +34,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-md-4 mb-4">
             <div class="card dashboard-card bg-info text-white">
                 <div class="card-body">
@@ -44,6 +44,7 @@
         </div>
     </div>
 
+    <!-- Patient Growth Chart -->
     <div class="row">
         <div class="col-md-8 mb-4">
             <div class="card">
@@ -51,11 +52,12 @@
                     <h5 class="card-title">Patient Growth</h5>
                 </div>
                 <div class="card-body">
-                    {# Placeholder for patient growth chart #}
+                    <canvas id="patientGrowthChart"></canvas>
                 </div>
             </div>
         </div>
 
+        <!-- Recent Activities -->
         <div class="col-md-4 mb-4">
             <div class="card">
                 <div class="card-header">
@@ -66,8 +68,7 @@
                     <div class="mb-2">
                         <strong>{{ activity.patient_name }}</strong>: {{ activity.action }}
                         <small class="text-muted d-block">
-                            {{ activity.timestamp.strftime('%Y-%m-%d %H:%M') }} 
-                            by {{ activity.admin_name }}
+                            {{ activity.timestamp.strftime('%Y-%m-%d %H:%M') }} by {{ activity.admin_name }}
                         </small>
                     </div>
                     {% endfor %}
@@ -77,6 +78,7 @@
         </div>
     </div>
 
+    <!-- Recent Patients Table -->
     <div class="row">
         <div class="col-12 mb-4">
             <div class="card">
@@ -113,4 +115,47 @@
         </div>
     </div>
 </div>
+
+<!-- Chart.js Integration -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const ctx = document.getElementById('patientGrowthChart').getContext('2d');
+
+        // Chart data passed from Flask
+        const patientGrowthLabels = {{ patient_growth.labels | tojson }};
+        const patientGrowthData = {{ patient_growth.data | tojson }};
+
+        // Chart.js configuration
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: patientGrowthLabels,
+                datasets: [{
+                    label: 'New Patients',
+                    data: patientGrowthData,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderWidth: 2,
+                    fill: true,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true, position: 'top' }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Month' },
+                    },
+                    y: {
+                        title: { display: true, text: 'Patients Added' },
+                        beginAtZero: true,
+                    }
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}

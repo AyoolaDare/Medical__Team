@@ -25,7 +25,7 @@
             </div>
         </div>
     </div>
-
+    
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -40,8 +40,8 @@
                                 <tr>
                                     <th>Date</th>
                                     <th>Weight</th>
-                                    <th>Blood Pressure</th>
-                                    <th>Sugar Level</th>
+                                    <th>BP</th>
+                                    <th>Sugar</th>
                                     <th>Prescription</th>
                                     <th>Notes</th>
                                 </tr>
@@ -49,7 +49,7 @@
                             <tbody>
                                 {% for record in patient.medical_records %}
                                 <tr>
-                                    <td>
+                                    <td data-label="Date">
                                         {% if record.timestamp %}
                                             {{ record.timestamp.strftime('%B %d, %Y at %I:%M %p') }}
                                         {% elif record.date %}
@@ -58,11 +58,11 @@
                                             No date available
                                         {% endif %}
                                     </td>
-                                    <td>{{ record.weight }}</td>
-                                    <td>{{ record.blood_pressure }}</td>
-                                    <td>{{ record.sugar_level }}</td>
-                                    <td>{{ record.prescription }}</td>
-                                    <td>{{ record.notes }}</td>
+                                    <td data-label="Weight">{{ record.weight }}</td>
+                                    <td data-label="BP">{{ record.blood_pressure }}</td>
+                                    <td data-label="Sugar">{{ record.sugar_level }}</td>
+                                    <td data-label="Prescription">{{ record.prescription }}</td>
+                                    <td data-label="Notes">{{ record.notes }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -74,7 +74,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>    
 </div>
 {% endblock %}
 
