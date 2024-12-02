@@ -6,7 +6,7 @@ bp = Blueprint('auth', __name__)
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if session.get('user_id'):
-        return redirect(url_for('admin.dashboard'))
+        return redirect(url_for('admin.dashboard'))  # Redirect to dashboard if logged in
     
     if request.method == 'POST':
         username = request.form['username']
@@ -25,5 +25,5 @@ def logout():
     session.pop('user_id', None)
     session.pop('username', None)
     session.pop('role', None)
+    flash('You have been logged out.', 'success')
     return redirect(url_for('auth.login'))
-

@@ -26,6 +26,13 @@
                         </div>
                     </div>
                     <div class="mb-3">
+                        <label for="age" class="form-label">Age</label>
+                        <input type="number" class="form-control" id="age" name="age" min="0" max="150" required>
+                        <div class="invalid-feedback">
+                            Please provide a valid age (0-150).
+                        </div>
+                    </div>
+                    <div class="mb-3">
                         <label for="phone_number" class="form-label">Phone Number</label>
                         <input type="tel" class="form-control" id="phone_number" name="phone_number" required>
                         <div class="invalid-feedback">
@@ -45,7 +52,6 @@
 
 {% block extra_js %}
 <script>
-    // Example starter JavaScript for disabling form submissions if there are invalid fields
     (function () {
         'use strict'
 
@@ -67,4 +73,3 @@
     })()
 </script>
 {% endblock %}
-

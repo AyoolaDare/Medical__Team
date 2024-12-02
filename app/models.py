@@ -22,15 +22,21 @@ class User:
 
 class Patient:
     @staticmethod
-    def create(first_name, last_name, phone_number):
+    def create(first_name, last_name, phone_number, age=None):
         try:
-            result = mongo.db.patients.insert_one({
+            patient_data = {
                 'first_name': first_name,
                 'last_name': last_name,
                 'phone_number': phone_number,
                 'medical_records': [],
                 'created_at': datetime.utcnow()
-            })
+            }
+            
+            # Add age if provided
+            if age is not None:
+                patient_data['age'] = int(age)
+            
+            result = mongo.db.patients.insert_one(patient_data)
             return result.inserted_id
         except Exception as e:
             print(f"Error creating patient: {e}")
@@ -77,7 +83,8 @@ class Patient:
             '$or': [
                 {'first_name': {'$regex': query, '$options': 'i'}},
                 {'last_name': {'$regex': query, '$options': 'i'}},
-                {'phone_number': {'$regex': query, '$options': 'i'}}
+                {'phone_number': {'$regex': query, '$options': 'i'}},
+                {'age': {'$regex': str(query), '$options': 'i'}}  # Convert query to string for age search
             ]
         }))
 

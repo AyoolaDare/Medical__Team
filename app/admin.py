@@ -49,8 +49,9 @@ def create_patient():
             first_name = request.form['first_name']
             last_name = request.form['last_name']
             phone_number = request.form['phone_number']
+            age = request.form['age']  # New field
             
-            new_patient_id = Patient.create(first_name, last_name, phone_number)
+            new_patient_id = Patient.create(first_name, last_name, phone_number, age)
             if new_patient_id:
                 Activity.create(
                     patient_id=new_patient_id,
@@ -84,4 +85,3 @@ def search():
 def recent_activities():
     activities = Activity.get_all()
     return render_template('recent_activities.html', activities=activities)
-

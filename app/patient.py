@@ -29,7 +29,8 @@ def update(patient_id):
         data = {
             'first_name': request.form['first_name'],
             'last_name': request.form['last_name'],
-            'phone_number': request.form['phone_number']
+            'phone_number': request.form['phone_number'],
+            'age': request.form.get('age')  # Added age field
         }
         if Patient.update(patient_id, data):
             Activity.create(
@@ -68,4 +69,3 @@ def add_medical_record(patient_id):
     else:
         flash('Error adding medical record')
     return redirect(url_for('patient.view', patient_id=patient_id))
-

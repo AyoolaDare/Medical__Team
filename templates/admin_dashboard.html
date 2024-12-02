@@ -2,156 +2,115 @@
 
 {% block title %}Admin Dashboard - Clinic Management{% endblock %}
 
-{% block extra_css %}
-<style>
-    .dashboard-card {
-        transition: transform 0.3s;
-    }
-    .dashboard-card:hover {
-        transform: translateY(-5px);
-    }
-    #patientGrowthChart {
-        max-height: 300px;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<h1 class="mb-4">Admin Dashboard</h1>
+<div class="container-fluid">
+    <h1 class="mb-4">Admin Dashboard</h1>
 
-<div class="row">
-    <div class="col-md-4 mb-4">
-        <div class="card dashboard-card bg-primary text-white">
-            <div class="card-body">
-                <h5 class="card-title">Total Patients</h5>
-                <h2 class="card-text">{{ patients|length }}</h2>
-            </div>
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <form action="{{ url_for('admin.search') }}" method="GET" class="d-flex">
+                <input type="text" name="query" class="form-control me-2" placeholder="Search patients by name, phone, or age" required>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
         </div>
     </div>
-    <div class="col-md-4 mb-4">
-        <div class="card dashboard-card bg-success text-white">
-            <div class="card-body">
-                <h5 class="card-title">Recent Activities</h5>
-                <h2 class="card-text">{{ recent_activities|length }}</h2>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4 mb-4">
-        <div class="card dashboard-card bg-info text-white">
-            <div class="card-body">
-                <h5 class="card-title">New Patients (This Month)</h5>
-                <h2 class="card-text">{{ patient_growth.data[-1] if patient_growth.data else 0 }}</h2>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="row">
-    <div class="col-md-8 mb-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title">Patient Growth</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="patientGrowthChart"></canvas>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4 mb-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title">Recent Activities</h5>
-            </div>
-            <div class="card-body">
-                <ul class="list-group list-group-flush">
-                    {% for activity in recent_activities[:5] %}
-                    <li class="list-group-item">
-                        <strong>{{ activity.patient_name }}</strong>: {{ activity.action }}<br>
-                        <small class="text-muted">{{ activity.timestamp.strftime('%Y-%m-%d %H:%M') }} by {{ activity.admin_name }}</small>
-                    </li>
-                    {% endfor %}
-                </ul>
-                <a href="{{ url_for('admin.recent_activities') }}" class="btn btn-secondary mt-3">View All Activities</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-12 mb-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title">Recent Patients</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Phone Number</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for patient in patients[:5] %}
-                            <tr>
-                                <td>{{ patient.first_name }} {{ patient.last_name }}</td>
-                                <td>{{ patient.phone_number }}</td>
-                                <td>
-                                    <a href="{{ url_for('patient.view', patient_id=patient._id) }}" class="btn btn-sm btn-info">View</a>
-                                    <a href="{{ url_for('patient.update', patient_id=patient._id) }}" class="btn btn-sm btn-warning">Update</a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card dashboard-card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Patients</h5>
+                    <h2 class="card-text">{{ patients|length }}</h2>
                 </div>
-                <a href="{{ url_for('admin.patient_list') }}" class="btn btn-secondary">View All Patients</a>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card dashboard-card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Recent Activities</h5>
+                    <h2 class="card-text">{{ recent_activities|length }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card dashboard-card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">New Patients (This Month)</h5>
+                    <h2 class="card-text">{{ patient_growth.data[-1] if patient_growth.data else 0 }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Patient Growth</h5>
+                </div>
+                <div class="card-body">
+                    {# Placeholder for patient growth chart #}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Recent Activities</h5>
+                </div>
+                <div class="card-body">
+                    {% for activity in recent_activities[:5] %}
+                    <div class="mb-2">
+                        <strong>{{ activity.patient_name }}</strong>: {{ activity.action }}
+                        <small class="text-muted d-block">
+                            {{ activity.timestamp.strftime('%Y-%m-%d %H:%M') }} 
+                            by {{ activity.admin_name }}
+                        </small>
+                    </div>
+                    {% endfor %}
+                    <a href="{{ url_for('admin.recent_activities') }}" class="btn btn-secondary mt-3">View All Activities</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Recent Patients</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Phone Number</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for patient in patients[:5] %}
+                                <tr>
+                                    <td>{{ patient.first_name }} {{ patient.last_name }}</td>
+                                    <td>{{ patient.phone_number }}</td>
+                                    <td>
+                                        <a href="{{ url_for('patient.view', patient_id=patient._id) }}" class="btn btn-sm btn-info">View</a>
+                                        <a href="{{ url_for('patient.update', patient_id=patient._id) }}" class="btn btn-sm btn-warning">Update</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <a href="{{ url_for('admin.patient_list') }}" class="btn btn-secondary">View All Patients</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
-
-{% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var ctx = document.getElementById('patientGrowthChart').getContext('2d');
-        var chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: {{ patient_growth.labels | tojson | safe }},
-                datasets: [{
-                    label: 'Patient Growth',
-                    data: {{ patient_growth.data | tojson | safe }},
-                    borderColor: 'rgb(75, 192, 192)',
-                    tension: 0.1,
-                    fill: false
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Number of New Patients'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Month'
-                        }
-                    }
-                }
-            }
-        });
-    });
-</script>
-{% endblock %}
-
