@@ -6,7 +6,7 @@
 __pycache__/
 
 # Ignore sensitive configuration files (ensure these are securely managed elsewhere)
-config.py
+
 
 # Ignore system files
 .DS_Store
