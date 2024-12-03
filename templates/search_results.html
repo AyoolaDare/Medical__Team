@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results - Genesis Global Medical Team{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Search Results</h1>
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">Results for "{{ query }}"</h5>
+        </div>
+        <div class="card-body">
+            {% if patients %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone Number</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for patient in patients %}
+                        <tr>
+                            <td>{{ patient.first_name }} {{ patient.last_name }}</td>
+                            <td>{{ patient.phone_number }}</td>
+                            <td>
+                                <a href="{{ url_for('patient.view', patient_id=patient.id) }}" class="btn btn-sm btn-info">View</a>
+                                <a href="{{ url_for('patient.update', patient_id=patient.id) }}" class="btn btn-sm btn-warning">Update</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center">No patients found matching your search criteria.</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="text-center mt-4">
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}
+

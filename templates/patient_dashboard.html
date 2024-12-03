@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Dashboard - Genesis Global Medical Team{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">Patient Information</h3>
+                </div>
+                <div class="card-body">
+                    <h4 class="card-subtitle mb-2">{{ patient.first_name }} {{ patient.last_name }}</h4>
+                    <p><strong>Phone:</strong> {{ patient.phone_number }}</p>
+                    <p><strong>Age:</strong> {{ patient.age or 'Not specified' }}</p>
+                    <div class="mt-3">
+                        <a href="{{ url_for('patient.update', patient_id=patient.id) }}" class="btn btn-warning">Update Information</a>
+                        <a href="{{ url_for('patient.history', patient_id=patient.id) }}" class="btn btn-info">View History</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h3 class="card-title mb-0">Add Medical Record</h3>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('patient.add_medical_record', patient_id=patient.id) }}" method="POST">
+                        <div class="mb-3">
+                            <label for="weight" class="form-label">Weight</label>
+                            <input type="text" class="form-control" id="weight" name="weight" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="blood_pressure" class="form-label">Blood Pressure</label>
+                            <input type="text" class="form-control" id="blood_pressure" name="blood_pressure" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="sugar_level" class="form-label">Sugar Level</label>
+                            <input type="text" class="form-control" id="sugar_level" name="sugar_level" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="prescription" class="form-label">Prescription</label>
+                            <input type="text" class="form-control" id="prescription" name="prescription" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Record</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="card-title mb-0">Latest Medical Records</h5>
+        </div>
+        <div class="card-body">
+            {% if patient.medical_records %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Weight</th>
+                            <th>BP</th>
+                            <th>Sugar</th>
+                            <th>Prescription</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in patient.medical_records[:5] %}
+                        <tr>
+                            <td data-label="Date">{{ record.timestamp }}</td>
+                            <td data-label="Weight">{{ record.weight }}</td>
+                            <td data-label="BP">{{ record.blood_pressure }}</td>
+                            <td data-label="Sugar">{{ record.sugar_level }}</td>
+                            <td data-label="Prescription">{{ record.prescription }}</td>
+                            <td data-label="Notes">{{ record.notes }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center">No medical records available.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media screen and (max-width: 600px) {
+        table {
+            border: 0;
+        }
+        table caption {
+            font-size: 1.3em;
+        }
+        table thead {
+            border: none;
+            clip: rect(0 0 0 0);
+            height: 1px;
+            margin: -1px;
+            overflow: hidden;
+            padding: 0;
+            position: absolute;
+            width: 1px;
+        }
+        table tr {
+            border-bottom: 3px solid #ddd;
+            display: block;
+            margin-bottom: .625em;
+        }
+        table td {
+            border-bottom: 1px solid #ddd;
+            display: block;
+            font-size: .8em;
+            text-align: right;
+        }
+        table td::before {
+            content: attr(data-label);
+            float: left;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        table td:last-child {
+            border-bottom: 0;
+        }
+    }
+</style>
+{% endblock %}

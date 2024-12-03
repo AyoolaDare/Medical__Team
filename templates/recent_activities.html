@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Recent Activities - Genesis Global Medical Team{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Recent Activities</h1>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">Activity Log</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Patient Name</th>
+                            <th>Action</th>
+                            <th>Admin</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for activity in activities %}
+                        <tr>
+                            <td>{{ activity.patient_name }}</td>
+                            <td>{{ activity.action }}</td>
+                            <td>{{ activity.admin_name }} ({{ activity.admin_role }})</td>
+                            <td>{{ activity.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}
+
