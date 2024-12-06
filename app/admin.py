@@ -2,11 +2,17 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from app.models import Patient, Activity
 from datetime import datetime, timedelta
 from collections import defaultdict
+import plotly.graph_objs as go
+import plotly.utils as pu
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 @bp.route('/dashboard')
 def dashboard():
+    if session.get('role') not in ['Admin', 'Doctor']:
+        flash('Access denied. Admin or Doctor privileges required.', 'error')
+        return redirect(url_for('auth.login'))
+
     patients = Patient.get_all()
     recent_activities = Activity.get_recent(limit=10)
     
@@ -20,10 +26,25 @@ def dashboard():
     start_date = end_date - timedelta(days=180)
     patient_growth = calculate_patient_growth(start_date, end_date)
     
+    # Prepare data for charts
+    weight_data = [float(patient.get('weight', 0)) for patient in patients if patient.get('weight')]
+    bp_values = [patient.get('blood_pressure', '').split('/') for patient in patients if patient.get('blood_pressure')]
+    systolic_data = [int(bp[0]) for bp in bp_values if len(bp) == 2]
+    diastolic_data = [int(bp[1]) for bp in bp_values if len(bp) == 2]
+    age_data = [int(patient.get('age', 0)) for patient in patients if patient.get('age')]
+    height_data = [float(patient.get('height', 0)) for patient in patients if patient.get('height')]
+    
     return render_template('admin_dashboard.html', 
                            patients=patients, 
                            recent_activities=recent_activities,
-                           patient_growth=patient_growth)
+                           patient_growth=patient_growth,
+                           weight_data=weight_data,
+                           systolic_data=systolic_data,
+                           diastolic_data=diastolic_data,
+                           age_data=age_data,
+                           height_data=height_data)
+
+# ... (rest of the admin.py file remains unchanged)
 
 def calculate_patient_growth(start_date, end_date):
     patients = Patient.get_all()
@@ -32,23 +53,52 @@ def calculate_patient_growth(start_date, end_date):
     for patient in patients:
         created_at = patient.get('created_at')
         if created_at:
-            # Convert the string to a datetime object
             created_at = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
             if start_date <= created_at <= end_date:
                 month_year = created_at.strftime('%Y-%m')
                 monthly_growth[month_year] += 1
     
-    # Sort the data by date
     sorted_growth = sorted(monthly_growth.items())
-    
-    # Prepare data for Chart.js
-    labels = [datetime.strptime(date, '%Y-%m').strftime('%b') for date, _ in sorted_growth]
+    labels = [datetime.strptime(date, '%Y-%m').strftime('%b %Y') for date, _ in sorted_growth]
     data = [count for _, count in sorted_growth]
     
     return {
         'labels': labels,
         'data': data
     }
+
+def generate_weight_distribution_graph(patients):
+    weights = [float(patient.get('weight', 0)) for patient in patients if patient.get('weight')]
+    
+    trace = go.Histogram(x=weights, nbinsx=20)
+    layout = go.Layout(title='Weight Distribution', xaxis_title='Weight (kg)', yaxis_title='Count')
+    fig = go.Figure(data=[trace], layout=layout)
+    
+    return pu.plot(fig, output_type='div')
+
+def generate_bp_distribution_graph(patients):
+    bp_values = [patient.get('blood_pressure', '').split('/') for patient in patients if patient.get('blood_pressure')]
+    systolic = [int(bp[0]) for bp in bp_values if len(bp) == 2]
+    diastolic = [int(bp[1]) for bp in bp_values if len(bp) == 2]
+    
+    trace_systolic = go.Box(y=systolic, name='Systolic')
+    trace_diastolic = go.Box(y=diastolic, name='Diastolic')
+    layout = go.Layout(title='Blood Pressure Distribution', yaxis_title='mmHg')
+    fig = go.Figure(data=[trace_systolic, trace_diastolic], layout=layout)
+    
+    return pu.plot(fig, output_type='div')
+
+def generate_combined_metrics_graph(patients):
+    weights = [float(patient.get('weight', 0)) for patient in patients if patient.get('weight')]
+    heights = [float(patient.get('height', 0)) for patient in patients if patient.get('height')]
+    ages = [int(patient.get('age', 0)) for patient in patients if patient.get('age')]
+    
+    trace_weight = go.Scatter(x=ages, y=weights, mode='markers', name='Weight vs Age')
+    trace_height = go.Scatter(x=ages, y=heights, mode='markers', name='Height vs Age')
+    layout = go.Layout(title='Combined Metrics', xaxis_title='Age', yaxis_title='Value')
+    fig = go.Figure(data=[trace_weight, trace_height], layout=layout)
+    
+    return pu.plot(fig, output_type='div')
 
 @bp.route('/create_patient', methods=['GET', 'POST'])
 def create_patient():

@@ -23,16 +23,25 @@ def create_app(config_class=Config):
     # Register blueprints
     from app.auth import bp as auth_bp
     from app.admin import bp as admin_bp
+    from app.doctor import bp as doctor_bp
+    from app.nurse import bp as nurse_bp
+    from app.reception import bp as reception_bp
     from app.patient import bp as patient_bp
 
-    app.register_blueprint(auth_bp)
+    app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(admin_bp, url_prefix='/admin')
+    app.register_blueprint(doctor_bp, url_prefix='/doctor')
+    app.register_blueprint(nurse_bp, url_prefix='/nurse')
+    app.register_blueprint(reception_bp, url_prefix='/reception')
     app.register_blueprint(patient_bp, url_prefix='/patient')
 
-    # Add a root route
     @app.route('/')
     def index():
         return redirect(url_for('auth.login'))
+
+    @app.route('/dashboard')
+    def dashboard():
+        return redirect(url_for('auth.dashboard'))
 
     return app
 
