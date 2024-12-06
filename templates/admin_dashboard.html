@@ -45,18 +45,55 @@
     </div>
 
     <div class="row">
-        <div class="col-md-8 mb-4">
+        <div class="col-md-6 mb-4">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title">Patient Growth</h5>
+                    <h5 class="card-title">Patient Count</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="patientGrowthChart"></canvas>
+                    <div id="patientCountChart"></div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4 mb-4">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Weight Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <div id="weightDistributionChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Blood Pressure Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <div id="bpDistributionChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Combined Metrics</h5>
+                </div>
+                <div class="card-body">
+                    <div id="combinedMetricsChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
             <div class="card">
                 <div class="card-header">
                     <h5 class="card-title">Recent Activities</h5>
@@ -79,10 +116,8 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="row">
-        <div class="col-12 mb-4">
+        <div class="col-md-6 mb-4">
             <div class="card">
                 <div class="card-header">
                     <h5 class="card-title">Recent Patients</h5>
@@ -118,41 +153,78 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script>
-    var ctx = document.getElementById('patientGrowthChart').getContext('2d');
-    var chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: {{ patient_growth.labels | tojson }},
-            datasets: [{
-                label: 'New Patients',
-                data: {{ patient_growth.data | tojson }},
-                backgroundColor: 'rgba(0, 123, 255, 0.2)',
-                borderColor: 'rgba(0, 123, 255, 1)',
-                borderWidth: 2,
-                pointBackgroundColor: 'rgba(0, 123, 255, 1)',
-                pointRadius: 4,
-                pointHoverRadius: 6
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        precision: 0
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
-        }
-    });
+    // Patient Count Chart
+    var patientCountData = [{
+        x: {{ patient_growth.labels | tojson }},
+        y: {{ patient_growth.data | tojson }},
+        type: 'scatter'
+    }];
+
+    var patientCountLayout = {
+        title: 'Patient Growth',
+        xaxis: { title: 'Month' },
+        yaxis: { title: 'New Patients' }
+    };
+
+    Plotly.newPlot('patientCountChart', patientCountData, patientCountLayout);
+
+    // Weight Distribution Chart
+    var weightData = [{
+        x: {{ weight_data | tojson }},
+        type: 'histogram',
+        nbinsx: 20
+    }];
+
+    var weightLayout = {
+        title: 'Weight Distribution',
+        xaxis: { title: 'Weight (kg)' },
+        yaxis: { title: 'Count' }
+    };
+
+    Plotly.newPlot('weightDistributionChart', weightData, weightLayout);
+
+    // Blood Pressure Distribution Chart
+    var bpData = [{
+        y: {{ systolic_data | tojson }},
+        type: 'box',
+        name: 'Systolic'
+    }, {
+        y: {{ diastolic_data | tojson }},
+        type: 'box',
+        name: 'Diastolic'
+    }];
+
+    var bpLayout = {
+        title: 'Blood Pressure Distribution',
+        yaxis: { title: 'mmHg' }
+    };
+
+    Plotly.newPlot('bpDistributionChart', bpData, bpLayout);
+
+    // Combined Metrics Chart
+    var combinedData = [{
+        x: {{ age_data | tojson }},
+        y: {{ weight_data | tojson }},
+        mode: 'markers',
+        type: 'scatter',
+        name:'Weight vs Age'
+    }, {
+        x: {{ age_data | tojson }},
+        y: {{ height_data | tojson }},
+        mode: 'markers',
+        type: 'scatter',
+        name: 'Height vs Age'
+    }];
+
+    var combinedLayout = {
+        title: 'Combined Metrics',
+        xaxis: { title: 'Age' },
+        yaxis: { title: 'Value' }
+    };
+
+    Plotly.newPlot('combinedMetricsChart', combinedData, combinedLayout);
 </script>
 {% endblock %}
 

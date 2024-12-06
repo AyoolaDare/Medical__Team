@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Nurse Dashboard - Genesis Global Medical Team{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4">Nurse Dashboard</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Patient Search</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('nurse.search') }}" method="GET" class="d-flex">
+                        <input type="text" name="query" class="form-control me-2" placeholder="Search patients by name or phone number" required>
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Recent Patients</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Phone Number</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for patient in recent_patients %}
+                                <tr>
+                                    <td>{{ patient.first_name }} {{ patient.last_name }}</td>
+                                    <td>{{ patient.phone_number }}</td>
+                                    <td>
+                                        <a href="{{ url_for('patient.view', patient_id=patient.id) }}" class="btn btn-sm btn-outline-info">View</a>
+                                        <a href="{{ url_for('patient.update', patient_id=patient.id) }}" class="btn btn-sm btn-outline-warning">Update</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Recent Activities</h5>
+                </div>
+                <div class="card-body">
+                    {% for activity in recent_activities %}
+                    <div class="mb-2">
+                        <strong>{{ activity.patient_name }}</strong>: {{ activity.action }}
+                        <small class="text-muted d-block">
+                            {% if activity.timestamp is string %}
+                                {{ activity.timestamp }}
+                            {% else %}
+                                {{ activity.timestamp.strftime('%Y-%m-%d %H:%M') }}
+                            {% endif %}
+                            by {{ activity.admin_name }}
+                        </small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
